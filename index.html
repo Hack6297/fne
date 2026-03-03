@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FunnyNetworkEngine</title>
+    <link rel="stylesheet" href="https://unpkg.com/7.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://unpkg.com/7.css" /></noscript>
+    <style>
+      :root {
+        --w7-w-bd: #000000b3;
+        --w7-w-bdr: 6px;
+        --w7-w-grad: linear-gradient(to right, #ffffff66, #0000001a, #ffffff33);
+        --w7-w-bg: #4580c4;
+        --w7-font: 9pt "Segoe UI", "SegoeUI", "Noto Sans", sans-serif;
+      }
+      body { margin: 0; overflow: hidden; font-family: "Segoe UI", sans-serif; }
+      #root { width: 100vw; height: 100vh; }
+      #loading-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #e8e8e8;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 99999; font-family: "Segoe UI", sans-serif;
+        transition: opacity 0.3s;
+      }
+      #loading-screen p { font-size: 12px; color: #333; margin: 0 0 12px 0; }
+    </style>
+  </head>
+  <body>
+    <div id="loading-screen">
+      <p>🎮 Loading FunnyNetworkEngine...</p>
+      <div role="progressbar" class="animate" style="width: 240px">
+        <div style="width: 60%"></div>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
