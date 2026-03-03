@@ -1,0 +1,1 @@
+"" | Out-File -Encoding utf8 server/community/migrations/__init__.py

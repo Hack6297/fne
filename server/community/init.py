@@ -1,0 +1,1 @@
+"" | Out-File -Encoding utf8 server/community/__init__.py
