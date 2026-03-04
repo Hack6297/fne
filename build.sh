@@ -1,4 +1,3 @@
-@"
 #!/usr/bin/env bash
 set -o errexit
 npm install
@@ -7,4 +6,3 @@ pip install -r requirements.txt
 cd server
 python manage.py migrate
 python manage.py collectstatic --no-input
-"@ | Out-File -Encoding utf8 build.sh
