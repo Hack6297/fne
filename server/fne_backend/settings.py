@@ -1,4 +1,3 @@
-@"
 import os
 from pathlib import Path
 
@@ -71,4 +70,3 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CORS_ALLOW_ALL_ORIGINS = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-"@ | Out-File -Encoding utf8 server/fne_backend/settings.py
