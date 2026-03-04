@@ -1,4 +1,3 @@
-@"
 from django.contrib import admin
 from django.urls import path
 from community import views
@@ -10,4 +9,3 @@ urlpatterns = [
     path('api/projects/<int:pk>/', views.project_detail, name='project_detail'),
     path('', views.index, name='index'),
 ]
-"@ | Out-File -Encoding utf8 server/fne_backend/urls.py
