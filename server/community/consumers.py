@@ -1,4 +1,3 @@
-@"
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -29,10 +28,37 @@ class CommunityConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_projects(self):
-        return [{'id': p.id, 'title': p.title, 'author': p.author, 'description': p.description, 'likes': p.likes, 'plays': p.plays, 'created_at': str(p.created_at), 'thumbnail': p.thumbnail} for p in Project.objects.all()[:50]]
+        projects = Project.objects.all()[:50]
+        result = []
+        for p in projects:
+            result.append({
+                'id': p.id,
+                'title': p.title,
+                'author': p.author,
+                'description': p.description,
+                'likes': p.likes,
+                'plays': p.plays,
+                'created_at': str(p.created_at),
+                'thumbnail': p.thumbnail
+            })
+        return result
 
     @database_sync_to_async
     def create_project(self, data):
-        p = Project.objects.create(title=data.get('title', 'Untitled'), author=data.get('author', 'Anonymous'), description=data.get('description', ''), level_data=data.get('level_data', {}), thumbnail=data.get('thumbnail', ''))
-        return {'id': p.id, 'title': p.title, 'author': p.author, 'description': p.description, 'likes': p.likes, 'plays': p.plays, 'created_at': str(p.created_at), 'thumbnail': p.thumbnail}
-"@ | Out-File -Encoding utf8 server/community/consumers.py
+        p = Project.objects.create(
+            title=data.get('title', 'Untitled'),
+            author=data.get('author', 'Anonymous'),
+            description=data.get('description', ''),
+            level_data=data.get('level_data', {}),
+            thumbnail=data.get('thumbnail', '')
+        )
+        return {
+            'id': p.id,
+            'title': p.title,
+            'author': p.author,
+            'description': p.description,
+            'likes': p.likes,
+            'plays': p.plays,
+            'created_at': str(p.created_at),
+            'thumbnail': p.thumbnail
+        }
