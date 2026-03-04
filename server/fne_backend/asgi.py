@@ -1,4 +1,3 @@
-@"
 import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
@@ -10,4 +9,3 @@ application = ProtocolTypeRouter({
     'http': get_asgi_application(),
     'websocket': URLRouter(websocket_urlpatterns),
 })
-"@ | Out-File -Encoding utf8 server/fne_backend/asgi.py
