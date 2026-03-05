@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-/* ============================================
-   FunnyNetworkEngine — Scratch 1.4 + Win7 Aero
-   7.css is loaded from CDN in index.html
-   ============================================ */
-
 * { box-sizing: border-box; }
 
 body {
@@ -18,13 +13,8 @@ body {
 
 #root { height: 100vh; width: 100vw; }
 
-.window {
-  margin: 0 !important;
-}
+.window { margin: 0 !important; }
 
-/* =========================================
-   SPRITE THUMBNAIL (Scratch 1.4 style)
-   ========================================= */
 .sprite14-thumb {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   width: 68px; height: 68px;
@@ -33,7 +23,6 @@ body {
   border: 2px solid #b0b2b4;
   background: #fff;
   position: relative;
-  font: var(--w7-font);
 }
 .sprite14-thumb:hover { border-color: #6090d0; background: #f0f4ff; }
 .sprite14-thumb.selected {
@@ -48,9 +37,6 @@ body {
   margin-top: 2px;
 }
 
-/* =========================================
-   SCRATCH 1.4 PANELS
-   ========================================= */
 .scratch14-stage-bg {
   background: #fff;
   border: 2px inset #b0b0b0;
@@ -60,9 +46,6 @@ body {
   background: linear-gradient(180deg, #e0e2e4 0%, #d0d2d4 100%);
 }
 
-/* =========================================
-   VIEWPORT
-   ========================================= */
 .viewport-grid {
   background-image:
     linear-gradient(rgba(60,120,200,0.06) 1px, transparent 1px),
@@ -70,15 +53,10 @@ body {
   background-size: 20px 20px;
 }
 
-.viewport-object {
-  position: absolute; cursor: move;
-}
+.viewport-object { position: absolute; cursor: move; }
 .viewport-object:hover { outline: 2px solid rgba(74,144,217,0.5); outline-offset: 1px; }
 .viewport-object.selected { outline: 2px solid #4a90d9; outline-offset: 1px; }
 
-/* =========================================
-   CONSOLE
-   ========================================= */
 .console-line {
   font-family: 'Consolas', 'Courier New', monospace;
   font-size: 10px; padding: 1px 6px;
@@ -89,9 +67,6 @@ body {
 .console-line.warn { color: #996600; background: #fffae0; }
 .console-line.info { color: #336699; }
 
-/* =========================================
-   COMMUNITY
-   ========================================= */
 .scratch14-community-header {
   background: linear-gradient(180deg, #4e7ec2 0%, #3965a5 100%);
   padding: 16px 24px;
@@ -104,30 +79,18 @@ body {
   padding: 0 16px;
 }
 .scratch14-community-nav-item {
-  padding: 8px 16px;
-  font-size: 12px;
-  color: #555;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  font-weight: 600;
+  padding: 8px 16px; font-size: 12px; color: #555;
+  cursor: pointer; border-bottom: 2px solid transparent; font-weight: 600;
 }
 .scratch14-community-nav-item:hover { color: #333; background: rgba(0,0,0,0.04); }
-.scratch14-community-nav-item.active {
-  color: #2a5ea0;
-  border-bottom-color: #2a5ea0;
-}
+.scratch14-community-nav-item.active { color: #2a5ea0; border-bottom-color: #2a5ea0; }
 
 .scratch14-project-card {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: box-shadow 0.15s;
+  background: #fff; border: 1px solid #ccc; border-radius: 6px;
+  overflow: hidden; cursor: pointer; transition: box-shadow 0.15s;
 }
 .scratch14-project-card:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
-  border-color: #4e7ec2;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15); border-color: #4e7ec2;
 }
 .scratch14-project-thumb {
   width: 100%; height: 100px;
@@ -137,139 +100,162 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-/* =========================================
-   GOOGLE BLOCKLY — 3D CLAY EFFECT
-   ========================================= */
-.blocklyMainBackground { fill: #dfe1e3 !important; }
+/* =============================================
+   SCRATCH 1.4 CLAY 3D BLOCKS — GERAS RENDERER
+   ============================================= */
 
-.blocklyToolboxDiv {
-  background: linear-gradient(180deg, #d8dade 0%, #c4c6ca 100%) !important;
-  border-right: 1px solid #999 !important;
-  overflow: hidden !important;
-  font-family: 'Segoe UI', sans-serif !important;
+/* Workspace background */
+.blocklyMainBackground {
+  fill: #d6d8da !important;
 }
 
-.blocklyFlyoutBackground { fill: #e0e2e4 !important; }
+/* Toolbox sidebar */
+.blocklyToolboxDiv {
+  background: linear-gradient(180deg, #d8dade 0%, #c0c2c6 100%) !important;
+  border-right: 1px solid #888 !important;
+  overflow: hidden !important;
+  font-family: 'Segoe UI', sans-serif !important;
+  padding: 2px 0 !important;
+}
 
 .blocklyTreeRow {
   border-radius: 3px !important;
-  margin: 1px 3px !important;
-  padding: 4px 8px !important;
-  transition: background 0.1s !important;
+  margin: 1px 4px !important;
+  padding: 3px 8px !important;
+  height: auto !important;
+  line-height: 18px !important;
 }
 .blocklyTreeRow:hover {
   background: rgba(100,150,220,0.2) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3) !important;
 }
 .blocklyTreeSelected {
   background: rgba(100,150,220,0.35) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.15) !important;
 }
-
-.blocklyPath {
-  stroke-width: 1.5px !important;
-  filter:
-    drop-shadow(0px -1px 0px rgba(255,255,255,0.45))
-    drop-shadow(0px 2px 0px rgba(0,0,0,0.25))
-    drop-shadow(1px 1px 2px rgba(0,0,0,0.15)) !important;
-}
-
-.blocklyPathDark {
-  fill: none !important;
-  stroke-width: 1px !important;
-  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.2)) !important;
-}
-
-.blocklyPathLight {
-  stroke-width: 1.5px !important;
-  stroke: rgba(255,255,255,0.5) !important;
-  filter: drop-shadow(0 -1px 0 rgba(255,255,255,0.3)) !important;
-}
-
-.blocklyText {
-  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif !important;
+.blocklyTreeLabel {
+  font-size: 11px !important;
   font-weight: 600 !important;
+  font-family: 'Segoe UI', sans-serif !important;
+}
+
+/* Flyout */
+.blocklyFlyoutBackground {
+  fill: #e4e6e8 !important;
+  fill-opacity: 0.97 !important;
+}
+
+/* ─── THE 3D CLAY BLOCK EFFECT ─── */
+
+/* Main block body — add outer glow/shadow for 3D pop */
+.blocklyPath {
+  stroke-width: 1px !important;
+  filter: drop-shadow(0px 1px 0px rgba(0,0,0,0.15)) !important;
+}
+
+/* Dark bottom/right edge — THIS is what makes the 3D depth */
+.blocklyPathDark {
+  display: block !important;
+  visibility: visible !important;
+  fill: none !important;
+  stroke-width: 2px !important;
+  stroke-opacity: 0.35 !important;
+}
+
+/* Light top/left highlight — THIS is the shiny clay top edge */
+.blocklyPathLight {
+  display: block !important;
+  visibility: visible !important;
+  stroke-width: 2px !important;
+  stroke-opacity: 0.55 !important;
+}
+
+/* Block text — bold white with shadow like Scratch 1.4 */
+.blocklyText {
+  font-family: 'Lucida Grande', 'Segoe UI', 'Helvetica Neue', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
   fill: #fff !important;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
-  filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.35)) !important;
+}
+
+.blocklyNonEditableText > text,
+.blocklyEditableText > text {
+  fill: #fff !important;
 }
 
 .blocklyDropdownText {
   fill: #fff !important;
-  font-weight: 600 !important;
-  filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.3)) !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
 }
 
+/* Input fields inside blocks */
 .blocklyEditableText > rect,
 .blocklyEditableText > .blocklyFieldRect {
-  rx: 4 !important;
-  ry: 4 !important;
-  stroke: rgba(0,0,0,0.25) !important;
-  filter: drop-shadow(inset 0 1px 2px rgba(0,0,0,0.15)) !important;
-}
-
-.blocklyFlyout {
-  opacity: 0.97 !important;
-}
-.blocklyFlyoutBackground {
-  fill: #e8eaec !important;
-  fill-opacity: 0.95 !important;
-}
-
-.blocklyScrollbarHandle {
   rx: 3 !important;
   ry: 3 !important;
-  fill: #a8adb5 !important;
-  stroke: #8a8f97 !important;
-}
-.blocklyScrollbarBackground {
-  fill: #e0e2e4 !important;
-}
-
-.blocklyTrash { opacity: 0.6; }
-.blocklyTrash:hover { opacity: 1; }
-
-.blocklyZoom > image { opacity: 0.6; }
-.blocklyZoom > image:hover { opacity: 1; }
-
-.blocklyHighlightedConnectionPath {
-  stroke: #ffeb3b !important;
-  stroke-width: 3px !important;
-  filter: drop-shadow(0 0 6px rgba(255,235,59,0.7)) !important;
-}
-
-.blocklyInsertionMarker > .blocklyPath {
   fill: rgba(0,0,0,0.15) !important;
+  stroke: rgba(0,0,0,0.2) !important;
+  stroke-width: 1px !important;
+}
+
+/* Selected block glow */
+.blocklySelected > .blocklyPath {
+  stroke: #fc3 !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 0 5px rgba(255,204,51,0.5)) !important;
+}
+
+/* Dragging block shadow */
+.blocklyDragging > .blocklyPath {
+  filter: drop-shadow(4px 6px 6px rgba(0,0,0,0.35)) !important;
+}
+
+/* Insertion marker */
+.blocklyInsertionMarker > .blocklyPath {
+  fill: rgba(0,0,0,0.12) !important;
   stroke: none !important;
   filter: none !important;
 }
 
-.blocklySelected > .blocklyPath {
-  stroke: #ffeb3b !important;
-  stroke-width: 2.5px !important;
-  filter:
-    drop-shadow(0 0 4px rgba(255,235,59,0.6))
-    drop-shadow(0px -1px 0px rgba(255,255,255,0.45))
-    drop-shadow(0px 2px 0px rgba(0,0,0,0.25)) !important;
+/* Connection highlight */
+.blocklyHighlightedConnectionPath {
+  stroke: #fc3 !important;
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 5px rgba(255,204,51,0.6)) !important;
 }
 
-.blocklyDragging > .blocklyPath {
-  filter:
-    drop-shadow(0px -1px 0px rgba(255,255,255,0.45))
-    drop-shadow(0px 2px 0px rgba(0,0,0,0.25))
-    drop-shadow(3px 6px 8px rgba(0,0,0,0.3)) !important;
+/* Scrollbars */
+.blocklyScrollbarHandle {
+  rx: 3 !important;
+  ry: 3 !important;
+  fill: #a0a5ad !important;
+  stroke: #888d95 !important;
+}
+.blocklyScrollbarBackground {
+  fill: #dfe1e3 !important;
 }
 
+/* Trashcan */
+.blocklyTrash { opacity: 0.5; }
+.blocklyTrash:hover { opacity: 1; }
+
+/* Zoom controls */
+.blocklyZoom > image { opacity: 0.5; }
+.blocklyZoom > image:hover { opacity: 1; }
+
+/* Comment */
 .blocklyCommentRect {
   fill: #fffde7 !important;
-  stroke: #f9a825 !important;
-  rx: 4 !important;
-  ry: 4 !important;
-  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.15)) !important;
+  stroke: #e6a800 !important;
+  rx: 3 !important;
+  ry: 3 !important;
 }
 
+/* =============================================
+   HIDE BLOCKLY ARTIFACTS
+   ============================================= */
 .injectionDiv {
   overflow: hidden !important;
+  clip: rect(0, auto, auto, 0) !important;
 }
 
 article[role="tabpanel"][hidden] {
@@ -298,49 +284,25 @@ article[role="tabpanel"][hidden] * {
   transition: opacity 0.3s ease !important;
 }
 
-.blocklyToolboxDiv:empty ~ .blocklyScrollbarVertical,
-.blocklyToolboxDiv:empty ~ .blocklyScrollbarHorizontal,
-.blocklyToolboxDiv[style*="width: 0"] ~ .blocklyScrollbarVertical,
-.blocklyToolboxDiv[style*="width: 0"] ~ .blocklyScrollbarHorizontal {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.blocklyFlyout[style*="display: none"] ~ .blocklyScrollbarVertical,
-.blocklyFlyout[style*="display: none"] ~ .blocklyScrollbarHorizontal,
-.blocklyFlyout[style*="visibility: hidden"] ~ .blocklyScrollbarVertical,
-.blocklyFlyout[style*="visibility: hidden"] ~ .blocklyScrollbarHorizontal {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.injectionDiv {
-  overflow: hidden !important;
-  clip: rect(0, auto, auto, 0) !important;
-}
-
-/* =========================================
-   STICKY NOTES — Windows 7 Gadget style
-   ========================================= */
-.sticky-note {
-  pointer-events: all !important;
-}
+/* =============================================
+   STICKY NOTES
+   ============================================= */
+.sticky-note { pointer-events: all !important; }
 .sticky-note .window {
   box-shadow: 2px 3px 10px rgba(0,0,0,0.3) !important;
-  transition: box-shadow 0.15s;
 }
 .sticky-note .window:hover {
   box-shadow: 2px 3px 14px rgba(0,0,0,0.4) !important;
 }
-.sticky-note .title-bar {
-  cursor: grab !important;
-  user-select: none;
-}
+.sticky-note .title-bar { cursor: grab !important; user-select: none; }
 .sticky-note textarea {
-  font-family: 'Segoe UI', 'Comic Sans MS', sans-serif !important;
+  font-family: 'Segoe UI', sans-serif !important;
   line-height: 1.4;
 }
 
+/* =============================================
+   MISC
+   ============================================= */
 .spinner {
   display: inline-block;
   width: 16px; height: 16px;
@@ -351,15 +313,7 @@ article[role="tabpanel"][hidden] * {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-ul[role="menubar"] > li {
-  font: var(--w7-font);
-}
+ul[role="menubar"] > li { font: var(--w7-font); }
 
-section.tabs {
-  display: flex;
-  flex-direction: column;
-}
-section.tabs > article[role="tabpanel"] {
-  flex: 1;
-  overflow: hidden;
-}
+section.tabs { display: flex; flex-direction: column; }
+section.tabs > article[role="tabpanel"] { flex: 1; overflow: hidden; }
