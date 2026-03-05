@@ -374,7 +374,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
         trashcan: true,
         media: '',
         sounds: false,
-        renderer: 'zelos',
+        renderer: 'geras',
       });
 
       loadWorkspace(workspaceRef.current, currentSpriteIdRef.current);
