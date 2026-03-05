@@ -1,4 +1,6 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import * as Blockly from 'blockly';
+import 'blockly/blocks';
 
 interface PlacedBlock {
   uid: string;
@@ -33,7 +35,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
   onScriptsChangeRef.current = onScriptsChange;
   selectedSpriteIdRef.current = selectedSpriteId;
 
-  function registerBlocks(Blockly: any) {
+  function registerBlocks() {
     var blocks: any[] = [
       { id: 'evt_start', msg: '▶ when green button clicked', color: '#c4a000', hat: true, next: true },
       { id: 'evt_key_pressed', msg: 'when key %1 pressed', color: '#c4a000', hat: true, next: true, args: [{ type: 'field_dropdown', name: 'KEY', options: [['space','space'],['w','w'],['a','a'],['s','s'],['d','d'],['up arrow','ArrowUp'],['down arrow','ArrowDown'],['left arrow','ArrowLeft'],['right arrow','ArrowRight'],['e','e'],['q','q'],['enter','Enter'],['shift','Shift']] }] },
@@ -103,7 +105,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
       (function(b) {
         if (Blockly.Blocks[b.id]) return;
         Blockly.Blocks[b.id] = {
-          init: function() {
+          init: function(this: any) {
             var json: any = {
               type: b.id,
               colour: b.color,
@@ -135,14 +137,10 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
               if (b.next) json.nextStatement = null;
             }
             if (b.hat) {
-              json.previousStatement = undefined;
               delete json.previousStatement;
+              json.nextStatement = null;
             }
             this.jsonInit(json);
-            if (b.hat) {
-              this.setDeletable(true);
-              this.setMovable(true);
-            }
           }
         };
       })(blocks[i]);
@@ -194,7 +192,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
       if (doInput && doInput.connection && doInput.connection.targetBlock()) {
         var innerBlock = doInput.connection.targetBlock();
         pb.innerUids = [];
-        var cur = innerBlock;
+        var cur: any = innerBlock;
         while (cur && !processed.has(cur.id)) {
           pb.innerUids.push(cur.id);
           cur = cur.getNextBlock ? cur.getNextBlock() : null;
@@ -205,7 +203,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
       if (elseInput && elseInput.connection && elseInput.connection.targetBlock()) {
         var elseBlock = elseInput.connection.targetBlock();
         pb.elseUids = [];
-        var cur2 = elseBlock;
+        var cur2: any = elseBlock;
         while (cur2 && !processed.has(cur2.id)) {
           pb.elseUids.push(cur2.id);
           cur2 = cur2.getNextBlock ? cur2.getNextBlock() : null;
@@ -215,7 +213,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
       result.push(pb);
 
       if (doInput && doInput.connection && doInput.connection.targetBlock()) {
-        var ib = doInput.connection.targetBlock();
+        var ib: any = doInput.connection.targetBlock();
         while (ib && !processed.has(ib.id)) {
           processBlock(ib, undefined, block.id);
           ib = ib.getNextBlock ? ib.getNextBlock() : null;
@@ -223,7 +221,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
       }
 
       if (elseInput && elseInput.connection && elseInput.connection.targetBlock()) {
-        var eb = elseInput.connection.targetBlock();
+        var eb: any = elseInput.connection.targetBlock();
         while (eb && !processed.has(eb.id)) {
           processBlock(eb, undefined, block.id);
           eb = eb.getNextBlock ? eb.getNextBlock() : null;
@@ -243,26 +241,18 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
 
   function saveWorkspace(ws: any) {
     try {
-      if ((window as any).Blockly && (window as any).Blockly.serialization) {
-        spriteDataMap.current[selectedSpriteIdRef.current] = {
-          type: 'json',
-          data: (window as any).Blockly.serialization.workspaces.save(ws)
-        };
-      }
-    } catch (e) {
-      // ignore
-    }
+      var state = Blockly.serialization.workspaces.save(ws);
+      spriteDataMap.current[selectedSpriteIdRef.current] = { type: 'json', data: state };
+    } catch (e) {}
   }
 
   function loadWorkspace(ws: any, spriteId: string) {
     try {
       var saved = spriteDataMap.current[spriteId];
-      if (saved && saved.type === 'json' && (window as any).Blockly && (window as any).Blockly.serialization) {
-        (window as any).Blockly.serialization.workspaces.load(saved.data, ws);
+      if (saved && saved.type === 'json') {
+        Blockly.serialization.workspaces.load(saved.data, ws);
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   }
 
   useImperativeHandle(ref, function() {
@@ -282,15 +272,12 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
   });
 
   useEffect(function() {
-    var Blockly = (window as any).Blockly;
-    if (!Blockly || !containerRef.current || didInit.current) return;
+    if (!containerRef.current || didInit.current) return;
     didInit.current = true;
 
     try {
-      registerBlocks(Blockly);
-    } catch (e) {
-      // ignore
-    }
+      registerBlocks();
+    } catch (e) {}
 
     var toolbox = {
       kind: 'categoryToolbox',
