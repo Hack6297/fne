@@ -29,11 +29,12 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
   const spriteDataMap = useRef<Record<string, any>>({});
   const isSwapping = useRef(false);
   const onScriptsChangeRef = useRef(onScriptsChange);
-  const selectedSpriteIdRef = useRef(selectedSpriteId);
+  const prevSpriteIdRef = useRef(selectedSpriteId);
+  const currentSpriteIdRef = useRef(selectedSpriteId);
   const didInit = useRef(false);
 
   onScriptsChangeRef.current = onScriptsChange;
-  selectedSpriteIdRef.current = selectedSpriteId;
+  currentSpriteIdRef.current = selectedSpriteId;
 
   function registerBlocks() {
     var blocks: any[] = [
@@ -177,7 +178,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
         inputs: inputs,
         x: pos.x,
         y: pos.y,
-        spriteId: selectedSpriteIdRef.current
+        spriteId: currentSpriteIdRef.current
       };
 
       if (prevUid) pb.prevUid = prevUid;
@@ -239,10 +240,10 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
     return result;
   }
 
-  function saveWorkspace(ws: any) {
+  function saveWorkspace(ws: any, spriteId: string) {
     try {
       var state = Blockly.serialization.workspaces.save(ws);
-      spriteDataMap.current[selectedSpriteIdRef.current] = { type: 'json', data: state };
+      spriteDataMap.current[spriteId] = { type: 'json', data: state };
     } catch (e) {}
   }
 
@@ -259,7 +260,7 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
     return {
       getAllWorkspaceData: function() {
         if (workspaceRef.current) {
-          saveWorkspace(workspaceRef.current);
+          saveWorkspace(workspaceRef.current, currentSpriteIdRef.current);
         }
         var copy: Record<string, any> = {};
         var keys = Object.keys(spriteDataMap.current);
@@ -376,14 +377,14 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
         renderer: 'zelos',
       });
 
-      loadWorkspace(workspaceRef.current, selectedSpriteIdRef.current);
+      loadWorkspace(workspaceRef.current, currentSpriteIdRef.current);
 
       workspaceRef.current.addChangeListener(function(e: any) {
         if (isSwapping.current) return;
         if (!e.type || e.type === 'ui' || e.type === 'viewport_change' || e.type === 'toolbox_item_select' || e.type === 'click') return;
         if (e.type === 'create' || e.type === 'delete' || e.type === 'move' || e.type === 'change') {
           var blocks = extractBlocks(workspaceRef.current);
-          onScriptsChangeRef.current(blocks, selectedSpriteIdRef.current);
+          onScriptsChangeRef.current(blocks, currentSpriteIdRef.current);
         }
       });
 
@@ -403,8 +404,11 @@ const BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref:
 
   useEffect(function() {
     if (!workspaceRef.current || !didInit.current) return;
+    var oldSpriteId = prevSpriteIdRef.current;
+    prevSpriteIdRef.current = selectedSpriteId;
+    if (oldSpriteId === selectedSpriteId) return;
     isSwapping.current = true;
-    saveWorkspace(workspaceRef.current);
+    saveWorkspace(workspaceRef.current, oldSpriteId);
     try { workspaceRef.current.clear(); } catch (e) {}
     loadWorkspace(workspaceRef.current, selectedSpriteId);
     setTimeout(function() {
