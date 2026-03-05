@@ -396,3 +396,32 @@ section.tabs > article[role="tabpanel"] {
   flex: 1;
   overflow: hidden;
 }
+/* Thinner 3D Scratch-style blocks */
+.blocklyPath {
+  stroke-width: 1.5px !important;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.25)) drop-shadow(0 -1px 0 rgba(255,255,255,0.3)) !important;
+}
+.blocklyPathDark {
+  display: none !important;
+}
+.blocklyPathLight {
+  stroke-width: 2px !important;
+  stroke-opacity: 0.6 !important;
+}
+.blocklyText {
+  font-size: 11pt !important;
+  font-weight: bold !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.3) !important;
+}
+.blocklyEditableText > rect {
+  rx: 4 !important;
+  ry: 4 !important;
+  fill: rgba(255,255,255,0.2) !important;
+}
+.blocklyDropdownText {
+  font-size: 10pt !important;
+}
+.zelos-renderer .blocklyPath {
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
