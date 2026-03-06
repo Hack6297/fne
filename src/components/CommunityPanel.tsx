@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Project {
   id: number;
@@ -21,129 +21,75 @@ export default function CommunityPanel({ onLoadProject }: Props) {
   var [showPublish, setShowPublish] = useState(false);
   var [publishName, setPublishName] = useState('');
   var [publishAuthor, setPublishAuthor] = useState('');
-  var [connected, setConnected] = useState(false);
-  var wsRef = useRef<WebSocket | null>(null);
+  var [serverOnline, setServerOnline] = useState(false);
+  var [loading, setLoading] = useState(true);
 
-  useEffect(function() {
-    var proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    var url = proto + '//' + window.location.host + '/ws/community/';
-    var ws: WebSocket;
-
-    function connect() {
-      try {
-        ws = new WebSocket(url);
-        wsRef.current = ws;
-
-        ws.onopen = function() {
-          setConnected(true);
-          ws.send(JSON.stringify({ type: 'get_projects' }));
-        };
-
-        ws.onmessage = function(e) {
-          try {
-            var data = JSON.parse(e.data);
-            if (data.type === 'projects_list' && data.projects) {
-              setProjects(data.projects);
-            } else if (data.type === 'project_added' && data.project) {
-              setProjects(function(prev) { return [data.project].concat(prev); });
-            } else if (data.type === 'project_detail' && data.project && data.project.level_data) {
-              if (onLoadProject) {
-                onLoadProject(data.project.level_data);
-              }
-            }
-          } catch (err) {}
-        };
-
-        ws.onclose = function() {
-          setConnected(false);
-          wsRef.current = null;
-          setTimeout(connect, 5000);
-        };
-
-        ws.onerror = function() {
-          setConnected(false);
-        };
-      } catch (err) {
-        setConnected(false);
-        setTimeout(connect, 5000);
-      }
-    }
-
-    connect();
-
+  function fetchProjects() {
+    setLoading(true);
     fetch('/api/projects/')
       .then(function(r) { return r.json(); })
-      .then(function(d) { if (d.projects) setProjects(d.projects); })
-      .catch(function() {});
+      .then(function(d) {
+        if (d.projects) {
+          setProjects(d.projects);
+          setServerOnline(true);
+        }
+        setLoading(false);
+      })
+      .catch(function() {
+        setServerOnline(false);
+        setLoading(false);
+      });
+  }
 
-    return function() {
-      if (wsRef.current) {
-        try { wsRef.current.close(); } catch (e) {}
-      }
-    };
-  }, [onLoadProject]);
+  useEffect(function() {
+    fetchProjects();
+    var interval = setInterval(fetchProjects, 15000);
+    return function() { clearInterval(interval); };
+  }, []);
 
   var publish = useCallback(function() {
     var d = localStorage.getItem('fne_level');
     if (!d) { alert('Save your level first! (File > Save Level)'); return; }
     var parsed: any;
     try { parsed = JSON.parse(d); } catch (e) { alert('Invalid save data'); return; }
-    var payload = {
-      type: 'publish',
-      title: publishName || parsed.levelName || 'Untitled',
-      author: publishAuthor || 'Anonymous',
-      description: '',
-      level_data: parsed,
-    };
 
-    var ws = wsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(payload));
-      setShowPublish(false);
-      setPublishName('');
-      setPublishAuthor('');
-      alert('Published!');
-    } else {
-      fetch('/api/projects/create/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+    fetch('/api/projects/create/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: publishName || parsed.levelName || 'Untitled',
+        author: publishAuthor || 'Anonymous',
+        description: '',
+        level_data: parsed,
+      }),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.id || data.status === 'ok') {
+          setShowPublish(false);
+          setPublishName('');
+          setPublishAuthor('');
+          alert('Published successfully!');
+          fetchProjects();
+        } else {
+          alert('Failed to publish');
+        }
       })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.status === 'ok' || data.id) {
-            setShowPublish(false);
-            setPublishName('');
-            setPublishAuthor('');
-            alert('Published successfully!');
-            fetch('/api/projects/')
-              .then(function(r) { return r.json(); })
-              .then(function(d) { if (d.projects) setProjects(d.projects); })
-              .catch(function() {});
-          } else {
-            alert('Failed to publish');
-          }
-        })
-        .catch(function() {
-          alert('Server is waking up. Please wait 30-60 seconds and try again.');
-        });
-    }
+      .catch(function() {
+        alert('Server is waking up. Wait 30 seconds and try again.');
+      });
   }, [publishName, publishAuthor]);
 
   function loadProject(id: number) {
-    var ws = wsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: 'get_project', id: id }));
-    } else {
-      fetch('/api/projects/' + id + '/')
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.level_data && onLoadProject) {
-            onLoadProject(data.level_data);
-          }
-        })
-        .catch(function() { alert('Failed to load project'); });
-    }
+    fetch('/api/projects/' + id + '/')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.level_data && onLoadProject) {
+          onLoadProject(data.level_data);
+          alert('Level loaded! Switch to Editor tab.');
+        }
+      })
+      .catch(function() { alert('Failed to load project'); });
   }
 
   var filteredProjects = projects;
@@ -166,10 +112,11 @@ export default function CommunityPanel({ onLoadProject }: Props) {
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <span style={{
               width: 8, height: 8, borderRadius: '50%',
-              background: connected ? '#4caf50' : '#f44336',
+              background: serverOnline ? '#4caf50' : '#f44336',
               display: 'inline-block'
             }} />
-            <span style={{ fontSize: '11px' }}>{connected ? 'Connected' : 'Offline'}</span>
+            <span style={{ fontSize: '11px', color: '#fff' }}>{serverOnline ? 'Online' : 'Offline'}</span>
+            <button onClick={fetchProjects} style={{ fontSize: '11px', padding: '2px 8px' }}>🔄 Refresh</button>
             <button onClick={function() { setShowPublish(true); }}>📤 Publish My Level</button>
           </div>
         </div>
@@ -190,10 +137,22 @@ export default function CommunityPanel({ onLoadProject }: Props) {
       </div>
 
       <div style={{ flex: 1, overflow: 'auto', padding: '16px' }}>
-        {filteredProjects.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <div role="progressbar" className="animate" style={{ width: '200px', margin: '0 auto' }}>
+              <div style={{ width: '60%' }}></div>
+            </div>
+            <p style={{ color: '#888', marginTop: '12px' }}>Loading projects...</p>
+          </div>
+        ) : filteredProjects.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
             <p style={{ fontSize: '18px' }}>No projects yet!</p>
             <p style={{ fontSize: '13px' }}>Be the first to publish a level.</p>
+            {!serverOnline && (
+              <p style={{ fontSize: '12px', color: '#c33', marginTop: '8px' }}>
+                Server may be waking up. Click 🔄 Refresh in 30 seconds.
+              </p>
+            )}
           </div>
         ) : (
           <div style={{
