@@ -30,7 +30,7 @@ export default function CommunityPanel({ onClose }: Props) {
     const connect = () => {
       setWsStatus('connecting');
       try {
-        ws = new WebSocket('ws://localhost:8000/ws/community/');
+        ws = new WebSocket('wss://' + window.location.host + '/ws/community/');
         wsRef.current = ws;
         ws.onopen = () => {
           setWsStatus('connected');
@@ -322,7 +322,7 @@ export default function CommunityPanel({ onClose }: Props) {
             }}>{p}</button>
           ))}
         </div>
-        <span>WebSocket: {wsStatus==='connected'?'🟢 Connected':wsStatus==='connecting'?'🟡 Connecting':'🔴 Offline'} · Django</span>
+        <span>WebSocket: {wsStatus==='connected'?'🟢 Online':wsStatus==='connecting'?'🟡 Busy':'🔴 Offline'} · Django</span>
       </div>
     </div>
   );
