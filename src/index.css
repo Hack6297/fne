@@ -101,15 +101,13 @@ body {
 }
 
 /* =============================================
-   SCRATCH 1.4 CLAY 3D BLOCKS — GERAS RENDERER
+   SCRATCH 1.4 3D CLAY BLOCKS — GERAS RENDERER
    ============================================= */
 
-/* Workspace background */
 .blocklyMainBackground {
   fill: #d6d8da !important;
 }
 
-/* Toolbox sidebar */
 .blocklyToolboxDiv {
   background: linear-gradient(180deg, #d8dade 0%, #c0c2c6 100%) !important;
   border-right: 1px solid #888 !important;
@@ -137,38 +135,31 @@ body {
   font-family: 'Segoe UI', sans-serif !important;
 }
 
-/* Flyout */
 .blocklyFlyoutBackground {
   fill: #e4e6e8 !important;
   fill-opacity: 0.97 !important;
 }
 
-/* ─── THE 3D CLAY BLOCK EFFECT ─── */
-
-/* Main block body — add outer glow/shadow for 3D pop */
 .blocklyPath {
   stroke-width: 1px !important;
   filter: drop-shadow(0px 1px 0px rgba(0,0,0,0.15)) !important;
 }
 
-/* Dark bottom/right edge — THIS is what makes the 3D depth */
 .blocklyPathDark {
   display: block !important;
   visibility: visible !important;
   fill: none !important;
   stroke-width: 2px !important;
-  stroke-opacity: 0.35 !important;
+  stroke-opacity: 0.4 !important;
 }
 
-/* Light top/left highlight — THIS is the shiny clay top edge */
 .blocklyPathLight {
   display: block !important;
   visibility: visible !important;
   stroke-width: 2px !important;
-  stroke-opacity: 0.55 !important;
+  stroke-opacity: 0.6 !important;
 }
 
-/* Block text — bold white with shadow like Scratch 1.4 */
 .blocklyText {
   font-family: 'Lucida Grande', 'Segoe UI', 'Helvetica Neue', sans-serif !important;
   font-size: 11px !important;
@@ -187,7 +178,6 @@ body {
   font-weight: bold !important;
 }
 
-/* Input fields inside blocks */
 .blocklyEditableText > rect,
 .blocklyEditableText > .blocklyFieldRect {
   rx: 3 !important;
@@ -197,33 +187,28 @@ body {
   stroke-width: 1px !important;
 }
 
-/* Selected block glow */
 .blocklySelected > .blocklyPath {
   stroke: #fc3 !important;
   stroke-width: 2px !important;
   filter: drop-shadow(0 0 5px rgba(255,204,51,0.5)) !important;
 }
 
-/* Dragging block shadow */
 .blocklyDragging > .blocklyPath {
   filter: drop-shadow(4px 6px 6px rgba(0,0,0,0.35)) !important;
 }
 
-/* Insertion marker */
 .blocklyInsertionMarker > .blocklyPath {
   fill: rgba(0,0,0,0.12) !important;
   stroke: none !important;
   filter: none !important;
 }
 
-/* Connection highlight */
 .blocklyHighlightedConnectionPath {
   stroke: #fc3 !important;
   stroke-width: 3px !important;
   filter: drop-shadow(0 0 5px rgba(255,204,51,0.6)) !important;
 }
 
-/* Scrollbars */
 .blocklyScrollbarHandle {
   rx: 3 !important;
   ry: 3 !important;
@@ -234,15 +219,11 @@ body {
   fill: #dfe1e3 !important;
 }
 
-/* Trashcan */
 .blocklyTrash { opacity: 0.5; }
 .blocklyTrash:hover { opacity: 1; }
-
-/* Zoom controls */
 .blocklyZoom > image { opacity: 0.5; }
 .blocklyZoom > image:hover { opacity: 1; }
 
-/* Comment */
 .blocklyCommentRect {
   fill: #fffde7 !important;
   stroke: #e6a800 !important;
@@ -250,9 +231,6 @@ body {
   ry: 3 !important;
 }
 
-/* =============================================
-   HIDE BLOCKLY ARTIFACTS
-   ============================================= */
 .injectionDiv {
   overflow: hidden !important;
   clip: rect(0, auto, auto, 0) !important;
@@ -284,9 +262,6 @@ article[role="tabpanel"][hidden] * {
   transition: opacity 0.3s ease !important;
 }
 
-/* =============================================
-   STICKY NOTES
-   ============================================= */
 .sticky-note { pointer-events: all !important; }
 .sticky-note .window {
   box-shadow: 2px 3px 10px rgba(0,0,0,0.3) !important;
@@ -300,9 +275,6 @@ article[role="tabpanel"][hidden] * {
   line-height: 1.4;
 }
 
-/* =============================================
-   MISC
-   ============================================= */
 .spinner {
   display: inline-block;
   width: 16px; height: 16px;
