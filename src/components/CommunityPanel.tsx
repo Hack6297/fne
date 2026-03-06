@@ -43,7 +43,7 @@ export default function CommunityPanel({ onLoadProject }: Props) {
 
   useEffect(function() {
     fetchProjects();
-    var interval = setInterval(fetchProjects, 15000);
+    var interval = setInterval(fetchProjects, 30000);
     return function() { clearInterval(interval); };
   }, []);
 
