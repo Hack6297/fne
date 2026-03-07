@@ -100,6 +100,10 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
+/* =============================================
+   GOOGLE BLOCKLY GERAS — 3D GRADIENT SHADOW
+   ============================================= */
+
 .blocklyMainBackground {
   fill: #d6d8da !important;
 }
@@ -136,30 +140,38 @@ body {
   fill-opacity: 0.97 !important;
 }
 
+/* MAIN BLOCK — gradient shadow on bottom */
 .blocklyPath {
   stroke-width: 1px !important;
+  filter: drop-shadow(0px 2px 1px rgba(0,0,0,0.3)) !important;
 }
 
+/* DARK EDGE — bottom/right shadow for 3D depth */
 .blocklyPathDark {
   display: block !important;
   visibility: visible !important;
   fill: none !important;
-  stroke-width: 2px !important;
-  stroke-opacity: 0.4 !important;
+  stroke-width: 3px !important;
+  stroke-opacity: 0.5 !important;
+  filter: drop-shadow(0px 1px 0px rgba(0,0,0,0.2)) !important;
 }
 
+/* LIGHT EDGE — top/left highlight for 3D shine */
 .blocklyPathLight {
   display: block !important;
   visibility: visible !important;
-  stroke-width: 2px !important;
-  stroke-opacity: 0.6 !important;
+  stroke-width: 3px !important;
+  stroke-opacity: 0.7 !important;
+  filter: drop-shadow(0px -1px 0px rgba(255,255,255,0.3)) !important;
 }
 
+/* Block text */
 .blocklyText {
   font-family: 'Lucida Grande', 'Segoe UI', sans-serif !important;
   font-size: 11px !important;
   font-weight: bold !important;
   fill: #fff !important;
+  filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.4)) !important;
 }
 
 .blocklyNonEditableText > text,
@@ -171,37 +183,46 @@ body {
   fill: #fff !important;
   font-size: 11px !important;
   font-weight: bold !important;
+  filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.3)) !important;
 }
 
+/* Input fields */
 .blocklyEditableText > rect,
 .blocklyEditableText > .blocklyFieldRect {
   rx: 3 !important;
   ry: 3 !important;
   fill: rgba(0,0,0,0.15) !important;
-  stroke: rgba(0,0,0,0.2) !important;
+  stroke: rgba(0,0,0,0.25) !important;
   stroke-width: 1px !important;
 }
 
+/* Selected block */
 .blocklySelected > .blocklyPath {
   stroke: #fc3 !important;
-  stroke-width: 2px !important;
+  stroke-width: 2.5px !important;
+  filter: drop-shadow(0px 2px 1px rgba(0,0,0,0.3)) drop-shadow(0 0 6px rgba(255,204,51,0.5)) !important;
 }
 
+/* Dragging block */
 .blocklyDragging > .blocklyPath {
-  filter: drop-shadow(4px 6px 6px rgba(0,0,0,0.35)) !important;
+  filter: drop-shadow(4px 8px 8px rgba(0,0,0,0.4)) !important;
 }
 
+/* Insertion marker */
 .blocklyInsertionMarker > .blocklyPath {
   fill: rgba(0,0,0,0.12) !important;
   stroke: none !important;
   filter: none !important;
 }
 
+/* Connection highlight */
 .blocklyHighlightedConnectionPath {
   stroke: #fc3 !important;
   stroke-width: 3px !important;
+  filter: drop-shadow(0 0 5px rgba(255,204,51,0.6)) !important;
 }
 
+/* Scrollbars */
 .blocklyScrollbarHandle {
   rx: 3 !important;
   ry: 3 !important;
@@ -212,18 +233,24 @@ body {
   fill: #dfe1e3 !important;
 }
 
+/* Trashcan and zoom */
 .blocklyTrash { opacity: 0.5; }
 .blocklyTrash:hover { opacity: 1; }
 .blocklyZoom > image { opacity: 0.5; }
 .blocklyZoom > image:hover { opacity: 1; }
 
+/* Comments */
 .blocklyCommentRect {
   fill: #fffde7 !important;
   stroke: #e6a800 !important;
   rx: 3 !important;
   ry: 3 !important;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.15)) !important;
 }
 
+/* =============================================
+   HIDE BLOCKLY ARTIFACTS
+   ============================================= */
 .injectionDiv {
   overflow: hidden !important;
   clip: rect(0, auto, auto, 0) !important;
@@ -255,6 +282,9 @@ article[role="tabpanel"][hidden] * {
   transition: opacity 0.3s ease !important;
 }
 
+/* =============================================
+   STICKY NOTES
+   ============================================= */
 .sticky-note { pointer-events: all !important; }
 .sticky-note .window {
   box-shadow: 2px 3px 10px rgba(0,0,0,0.3) !important;
@@ -268,6 +298,9 @@ article[role="tabpanel"][hidden] * {
   line-height: 1.4;
 }
 
+/* =============================================
+   MISC
+   ============================================= */
 .spinner {
   display: inline-block;
   width: 16px; height: 16px;
