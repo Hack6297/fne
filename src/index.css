@@ -100,10 +100,6 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-/* =============================================
-   SCRATCH 1.4 3D CLAY BLOCKS — GERAS RENDERER
-   ============================================= */
-
 .blocklyMainBackground {
   fill: #d6d8da !important;
 }
@@ -142,7 +138,6 @@ body {
 
 .blocklyPath {
   stroke-width: 1px !important;
-  filter: drop-shadow(0px 1px 0px rgba(0,0,0,0.15)) !important;
 }
 
 .blocklyPathDark {
@@ -161,7 +156,7 @@ body {
 }
 
 .blocklyText {
-  font-family: 'Lucida Grande', 'Segoe UI', 'Helvetica Neue', sans-serif !important;
+  font-family: 'Lucida Grande', 'Segoe UI', sans-serif !important;
   font-size: 11px !important;
   font-weight: bold !important;
   fill: #fff !important;
@@ -190,7 +185,6 @@ body {
 .blocklySelected > .blocklyPath {
   stroke: #fc3 !important;
   stroke-width: 2px !important;
-  filter: drop-shadow(0 0 5px rgba(255,204,51,0.5)) !important;
 }
 
 .blocklyDragging > .blocklyPath {
@@ -206,7 +200,6 @@ body {
 .blocklyHighlightedConnectionPath {
   stroke: #fc3 !important;
   stroke-width: 3px !important;
-  filter: drop-shadow(0 0 5px rgba(255,204,51,0.6)) !important;
 }
 
 .blocklyScrollbarHandle {
