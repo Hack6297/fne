@@ -27,7 +27,7 @@ var registered = false;
 function regBlocks() {
   if (registered) return;
   registered = true;
-  var d = [
+  var d: any[] = [
     {id:'evt_start',msg:'▶ when green button clicked',color:'#c4a000',hat:true,next:true},
     {id:'evt_key_pressed',msg:'when key %1 pressed',color:'#c4a000',hat:true,next:true,args:[{type:'field_dropdown',name:'KEY',options:[['space','space'],['w','w'],['a','a'],['s','s'],['d','d'],['up arrow','ArrowUp'],['down arrow','ArrowDown'],['left arrow','ArrowLeft'],['right arrow','ArrowRight'],['e','e'],['q','q'],['enter','Enter'],['shift','Shift']]}]},
     {id:'evt_clicked',msg:'when this sprite clicked',color:'#c4a000',hat:true,next:true},
@@ -91,20 +91,93 @@ function regBlocks() {
     {id:'lib_platform_lr',msg:'↔️ Platform Move Left-Right',color:'#17becf',prev:true,next:true},
     {id:'lib_platform_ud',msg:'↕️ Platform Move Up-Down',color:'#17becf',prev:true,next:true},
   ];
-  for(var i=0;i<d.length;i++){(function(b:any){if(Blockly.Blocks[b.id])return;Blockly.Blocks[b.id]={init:function(this:any){var j:any={type:b.id,colour:b.color,tooltip:b.msg};if(b.cblock){if(b.hasElse){j.message0=b.msg;j.args0=b.args||[];j.message1='%1';j.args1=[{type:'input_statement',name:'DO'}];j.message2='else';j.message3='%1';j.args3=[{type:'input_statement',name:'ELSE'}];j.previousStatement=null;j.nextStatement=null;}else{j.message0=b.msg;j.args0=b.args||[];j.message1='%1';j.args1=[{type:'input_statement',name:'DO'}];j.previousStatement=null;j.nextStatement=null;}}else{j.message0=b.msg;j.args0=b.args||[];if(b.prev)j.previousStatement=null;if(b.next)j.nextStatement=null;}if(b.hat){delete j.previousStatement;j.nextStatement=null;}this.jsonInit(j);}};})(d[i]);}
+  for (var i = 0; i < d.length; i++) {
+    (function(b: any) {
+      if (Blockly.Blocks[b.id]) return;
+      Blockly.Blocks[b.id] = {
+        init: function(this: any) {
+          var j: any = { type: b.id, colour: b.color, tooltip: b.msg };
+          if (b.cblock) {
+            if (b.hasElse) {
+              j.message0 = b.msg; j.args0 = b.args || [];
+              j.message1 = '%1'; j.args1 = [{ type: 'input_statement', name: 'DO' }];
+              j.message2 = 'else';
+              j.message3 = '%1'; j.args3 = [{ type: 'input_statement', name: 'ELSE' }];
+              j.previousStatement = null; j.nextStatement = null;
+            } else {
+              j.message0 = b.msg; j.args0 = b.args || [];
+              j.message1 = '%1'; j.args1 = [{ type: 'input_statement', name: 'DO' }];
+              j.previousStatement = null; j.nextStatement = null;
+            }
+          } else {
+            j.message0 = b.msg; j.args0 = b.args || [];
+            if (b.prev) j.previousStatement = null;
+            if (b.next) j.nextStatement = null;
+          }
+          if (b.hat) { delete j.previousStatement; j.nextStatement = null; }
+          this.jsonInit(j);
+        }
+      };
+    })(d[i]);
+  }
 }
 
-var TOOLBOX={kind:'categoryToolbox',contents:[
-  {kind:'category',name:'⚡ Events',colour:'#c4a000',contents:[{kind:'block',type:'evt_start'},{kind:'block',type:'evt_key_pressed'},{kind:'block',type:'evt_clicked'},{kind:'block',type:'evt_touching'},{kind:'block',type:'evt_stop_clicked'},{kind:'block',type:'evt_receive'}]},
-  {kind:'category',name:'🎮 Controls',colour:'#4a6cd4',contents:[{kind:'block',type:'ctrl_forever'},{kind:'block',type:'ctrl_if'},{kind:'block',type:'ctrl_if_else'},{kind:'block',type:'ctrl_repeat'},{kind:'block',type:'ctrl_wait'},{kind:'block',type:'ctrl_stop_all'},{kind:'block',type:'ctrl_set_speed'},{kind:'block',type:'ctrl_go_to'},{kind:'block',type:'ctrl_glide_to'},{kind:'block',type:'ctrl_broadcast'},{kind:'block',type:'ctrl_broadcast_wait'}]},
-  {kind:'category',name:'🔧 Physics',colour:'#e8601c',contents:[{kind:'block',type:'phys_set_gravity'},{kind:'block',type:'phys_jump'},{kind:'block',type:'phys_force'},{kind:'block',type:'phys_velocity'},{kind:'block',type:'phys_mass'},{kind:'block',type:'phys_bounce'},{kind:'block',type:'phys_friction'},{kind:'block',type:'phys_change_x'},{kind:'block',type:'phys_change_y'},{kind:'block',type:'phys_set_x'},{kind:'block',type:'phys_set_y'}]},
-  {kind:'category',name:'👁️ Looks',colour:'#7b2f8e',contents:[{kind:'block',type:'looks_color'},{kind:'block',type:'looks_size'},{kind:'block',type:'looks_change_size'},{kind:'block',type:'looks_show'},{kind:'block',type:'looks_hide'},{kind:'block',type:'looks_ghost'},{kind:'block',type:'looks_say'},{kind:'block',type:'looks_say_for'},{kind:'block',type:'looks_rotate'},{kind:'block',type:'looks_set_rotation'},{kind:'block',type:'looks_camera_follow'},{kind:'block',type:'looks_layer'}]},
-  {kind:'category',name:'🔊 Sound',colour:'#c94fc9',contents:[{kind:'block',type:'snd_play'},{kind:'block',type:'snd_play_uploaded'},{kind:'block',type:'snd_volume'},{kind:'block',type:'snd_stop'}]},
-  {kind:'category',name:'🔢 Math',colour:'#49a249',contents:[{kind:'block',type:'math_set_var'},{kind:'block',type:'math_change_var'},{kind:'block',type:'math_set_score'},{kind:'block',type:'math_change_score'},{kind:'block',type:'math_reset_score'},{kind:'block',type:'math_log_score'},{kind:'block',type:'math_random'},{kind:'block',type:'math_log_vars'}]},
-  {kind:'category',name:'📁 File',colour:'#2e8e8e',contents:[{kind:'block',type:'file_save'},{kind:'block',type:'file_load'},{kind:'block',type:'file_export'},{kind:'block',type:'file_import'},{kind:'block',type:'file_delete'}]},
-  {kind:'category',name:'📋 Logs',colour:'#888888',contents:[{kind:'block',type:'log_msg'},{kind:'block',type:'log_var'}]},
-  {kind:'category',name:'📚 Library',colour:'#17becf',contents:[{kind:'block',type:'lib_player_controls'},{kind:'block',type:'lib_platform_lr'},{kind:'block',type:'lib_platform_ud'}]},
-]};
+var TOOLBOX = {
+  kind: 'categoryToolbox',
+  contents: [
+    { kind: 'category', name: '⚡ Events', colour: '#c4a000', contents: [
+      { kind: 'block', type: 'evt_start' }, { kind: 'block', type: 'evt_key_pressed' },
+      { kind: 'block', type: 'evt_clicked' }, { kind: 'block', type: 'evt_touching' },
+      { kind: 'block', type: 'evt_stop_clicked' }, { kind: 'block', type: 'evt_receive' },
+    ]},
+    { kind: 'category', name: '🎮 Controls', colour: '#4a6cd4', contents: [
+      { kind: 'block', type: 'ctrl_forever' }, { kind: 'block', type: 'ctrl_if' },
+      { kind: 'block', type: 'ctrl_if_else' }, { kind: 'block', type: 'ctrl_repeat' },
+      { kind: 'block', type: 'ctrl_wait' }, { kind: 'block', type: 'ctrl_stop_all' },
+      { kind: 'block', type: 'ctrl_set_speed' }, { kind: 'block', type: 'ctrl_go_to' },
+      { kind: 'block', type: 'ctrl_glide_to' }, { kind: 'block', type: 'ctrl_broadcast' },
+      { kind: 'block', type: 'ctrl_broadcast_wait' },
+    ]},
+    { kind: 'category', name: '🔧 Physics', colour: '#e8601c', contents: [
+      { kind: 'block', type: 'phys_set_gravity' }, { kind: 'block', type: 'phys_jump' },
+      { kind: 'block', type: 'phys_force' }, { kind: 'block', type: 'phys_velocity' },
+      { kind: 'block', type: 'phys_mass' }, { kind: 'block', type: 'phys_bounce' },
+      { kind: 'block', type: 'phys_friction' }, { kind: 'block', type: 'phys_change_x' },
+      { kind: 'block', type: 'phys_change_y' }, { kind: 'block', type: 'phys_set_x' },
+      { kind: 'block', type: 'phys_set_y' },
+    ]},
+    { kind: 'category', name: '👁️ Looks', colour: '#7b2f8e', contents: [
+      { kind: 'block', type: 'looks_color' }, { kind: 'block', type: 'looks_size' },
+      { kind: 'block', type: 'looks_change_size' }, { kind: 'block', type: 'looks_show' },
+      { kind: 'block', type: 'looks_hide' }, { kind: 'block', type: 'looks_ghost' },
+      { kind: 'block', type: 'looks_say' }, { kind: 'block', type: 'looks_say_for' },
+      { kind: 'block', type: 'looks_rotate' }, { kind: 'block', type: 'looks_set_rotation' },
+      { kind: 'block', type: 'looks_camera_follow' }, { kind: 'block', type: 'looks_layer' },
+    ]},
+    { kind: 'category', name: '🔊 Sound', colour: '#c94fc9', contents: [
+      { kind: 'block', type: 'snd_play' }, { kind: 'block', type: 'snd_play_uploaded' },
+      { kind: 'block', type: 'snd_volume' }, { kind: 'block', type: 'snd_stop' },
+    ]},
+    { kind: 'category', name: '🔢 Math', colour: '#49a249', contents: [
+      { kind: 'block', type: 'math_set_var' }, { kind: 'block', type: 'math_change_var' },
+      { kind: 'block', type: 'math_set_score' }, { kind: 'block', type: 'math_change_score' },
+      { kind: 'block', type: 'math_reset_score' }, { kind: 'block', type: 'math_log_score' },
+      { kind: 'block', type: 'math_random' }, { kind: 'block', type: 'math_log_vars' },
+    ]},
+    { kind: 'category', name: '📁 File', colour: '#2e8e8e', contents: [
+      { kind: 'block', type: 'file_save' }, { kind: 'block', type: 'file_load' },
+      { kind: 'block', type: 'file_export' }, { kind: 'block', type: 'file_import' },
+      { kind: 'block', type: 'file_delete' },
+    ]},
+    { kind: 'category', name: '📋 Logs', colour: '#888888', contents: [
+      { kind: 'block', type: 'log_msg' }, { kind: 'block', type: 'log_var' },
+    ]},
+    { kind: 'category', name: '📚 Library', colour: '#17becf', contents: [
+      { kind: 'block', type: 'lib_player_controls' }, { kind: 'block', type: 'lib_platform_lr' },
+      { kind: 'block', type: 'lib_platform_ud' },
+    ]},
+  ]
+};
 
 var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: any) {
   var selectedSpriteId = props.selectedSpriteId;
@@ -112,7 +185,7 @@ var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: a
   var onLog = props.onLog;
   var containerRef = useRef<HTMLDivElement>(null);
   var wsRef = useRef<any>(null);
-  var dataMap = useRef<Record<string,any>>({});
+  var dataMap = useRef<Record<string, any>>({});
   var swapping = useRef(false);
   var cbRef = useRef(onScriptsChange);
   var prevId = useRef(selectedSpriteId);
@@ -136,8 +209,8 @@ var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: a
           if (fr[k].name && fr[k].getValue) inp.push(String(fr[k].getValue()));
         }
       }
-      var pos = b.getRelativeToSurfaceXY ? b.getRelativeToSurfaceXY() : {x:0,y:0};
-      var pb: PlacedBlock = {uid:b.id,blockId:b.type,inputs:inp,x:pos.x,y:pos.y,spriteId:curId.current};
+      var pos = b.getRelativeToSurfaceXY ? b.getRelativeToSurfaceXY() : { x: 0, y: 0 };
+      var pb: PlacedBlock = { uid: b.id, blockId: b.type, inputs: inp, x: pos.x, y: pos.y, spriteId: curId.current };
       if (pv) pb.prevUid = pv;
       if (pa) pb.parentUid = pa;
       var nb = b.getNextBlock ? b.getNextBlock() : null;
@@ -170,18 +243,21 @@ var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: a
   }
 
   function save(ws: any, sid: string) {
-    try { dataMap.current[sid] = {type:'json',data:Blockly.serialization.workspaces.save(ws)}; } catch(_){}
+    try { dataMap.current[sid] = { type: 'json', data: Blockly.serialization.workspaces.save(ws) }; } catch (_) {}
   }
 
   function load(ws: any, sid: string) {
-    try { var s = dataMap.current[sid]; if (s && s.type==='json') Blockly.serialization.workspaces.load(s.data, ws); } catch(_){}
+    try {
+      var s = dataMap.current[sid];
+      if (s && s.type === 'json') Blockly.serialization.workspaces.load(s.data, ws);
+    } catch (_) {}
   }
 
   useImperativeHandle(ref, function() {
     return {
       getAllWorkspaceData: function() {
         if (wsRef.current) save(wsRef.current, curId.current);
-        var c: Record<string,any> = {};
+        var c: Record<string, any> = {};
         var k = Object.keys(dataMap.current);
         for (var i = 0; i < k.length; i++) c[k[i]] = dataMap.current[k[i]];
         return c;
@@ -196,28 +272,29 @@ var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: a
     try {
       wsRef.current = Blockly.inject(containerRef.current, {
         toolbox: TOOLBOX,
-        grid: {spacing:20,length:3,colour:'#ccc',snap:true},
-        zoom: {controls:true,wheel:true,startScale:0.9,maxScale:3,minScale:0.3},
+        grid: { spacing: 20, length: 3, colour: '#ccc', snap: true },
+        zoom: { controls: true, wheel: true, startScale: 0.9, maxScale: 3, minScale: 0.3 },
         trashcan: true,
         media: '',
         sounds: false,
-        renderer: 'geras'
+        renderer: 'geras',
+        scrollbars: false
       });
       load(wsRef.current, curId.current);
       wsRef.current.addChangeListener(function(ev: any) {
         if (swapping.current) return;
         var t = ev.type;
-        if (!t||t==='ui'||t==='viewport_change'||t==='toolbox_item_select'||t==='click') return;
-        if (t==='create'||t==='delete'||t==='move'||t==='change') {
+        if (!t || t === 'ui' || t === 'viewport_change' || t === 'toolbox_item_select' || t === 'click') return;
+        if (t === 'create' || t === 'delete' || t === 'move' || t === 'change') {
           cbRef.current(extract(wsRef.current), curId.current);
         }
       });
       if (onLog) onLog('Blockly ready (geras)');
-    } catch(e) {
-      if (onLog) onLog('Blockly error: '+e);
+    } catch (e) {
+      if (onLog) onLog('Blockly error: ' + e);
     }
     return function() {
-      if (wsRef.current) { try{wsRef.current.dispose();}catch(_){} wsRef.current=null; }
+      if (wsRef.current) { try { wsRef.current.dispose(); } catch (_) {} wsRef.current = null; }
       inited.current = false;
     };
   }, []);
@@ -229,7 +306,7 @@ var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: a
     if (old === selectedSpriteId) return;
     swapping.current = true;
     save(wsRef.current, old);
-    try { wsRef.current.clear(); } catch(_){}
+    try { wsRef.current.clear(); } catch (_) {}
     load(wsRef.current, selectedSpriteId);
     setTimeout(function() {
       swapping.current = false;
@@ -237,7 +314,7 @@ var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: a
     }, 100);
   }, [selectedSpriteId]);
 
-  return <div ref={containerRef} style={{width:'100%',height:'100%',minHeight:'300px'}} />;
+  return <div ref={containerRef} style={{ width: '100%', height: '100%', minHeight: '300px' }} />;
 });
 
 export default BlocklyWorkspace;
