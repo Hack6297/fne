@@ -274,12 +274,30 @@ article[role="tabpanel"][hidden] * {
 }
 .blockly-container-wrapper:empty {
   display: none !important;
-}
-
 .blocklyScrollbarHorizontal,
 .blocklyScrollbarVertical {
   z-index: 1 !important;
   transition: opacity 0.3s ease !important;
+}
+
+.blocklyToolboxDiv[style*="display: none"] ~ .blocklyScrollbarVertical,
+.blocklyToolboxDiv[style*="display: none"] ~ .blocklyScrollbarHorizontal,
+.blocklyToolboxDiv:not([style]) + .blocklyFlyout[style*="display: none"] ~ .blocklyScrollbarVertical,
+.blocklyToolboxDiv:not([style]) + .blocklyFlyout[style*="display: none"] ~ .blocklyScrollbarHorizontal {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.blocklyFlyout[style*="display: none"] ~ .blocklyScrollbarVertical,
+.blocklyFlyout[style*="display: none"] ~ .blocklyScrollbarHorizontal {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.blocklyScrollbarVertical[style*="display: none"],
+.blocklyScrollbarHorizontal[style*="display: none"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* =============================================
