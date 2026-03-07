@@ -333,3 +333,7 @@ ul[role="menubar"] > li { font: var(--w7-font); }
 
 section.tabs { display: flex; flex-direction: column; }
 section.tabs > article[role="tabpanel"] { flex: 1; overflow: hidden; }
+.blocklyScrollbarVertical,
+.blocklyScrollbarHorizontal {
+  display: none !important;
+}
