@@ -1,317 +1,243 @@
-@import "tailwindcss";
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import * as Blockly from 'blockly';
+import 'blockly/blocks';
 
-* { box-sizing: border-box; }
-
-body {
-  margin: 0; padding: 0;
-  background: #c6c7c5;
-  font-family: 'Segoe UI', 'Tahoma', 'Helvetica', sans-serif;
-  overflow: hidden;
-  height: 100vh; width: 100vw; color: #333;
-  font-size: 12px;
-}
-
-#root { height: 100vh; width: 100vw; }
-
-.window { margin: 0 !important; }
-
-.sprite14-thumb {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 68px; height: 68px;
-  border-radius: 4px;
-  cursor: pointer;
-  border: 2px solid #b0b2b4;
-  background: #fff;
-  position: relative;
-}
-.sprite14-thumb:hover { border-color: #6090d0; background: #f0f4ff; }
-.sprite14-thumb.selected {
-  border-color: #4080cc;
-  background: #e0ecff;
-  box-shadow: 0 0 0 2px rgba(64,128,204,0.3);
-}
-.sprite14-thumb-name {
-  font-size: 8px; color: #555;
-  text-align: center; max-width: 60px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  margin-top: 2px;
+interface PlacedBlock {
+  uid: string;
+  blockId: string;
+  inputs: string[];
+  x: number;
+  y: number;
+  nextUid?: string;
+  prevUid?: string;
+  parentUid?: string;
+  innerUids?: string[];
+  elseUids?: string[];
+  spriteId?: string;
 }
 
-.scratch14-stage-bg {
-  background: #fff;
-  border: 2px inset #b0b0b0;
+interface Props {
+  selectedSpriteId: string;
+  onScriptsChange: (blocks: PlacedBlock[], spriteId: string) => void;
+  onLog?: (msg: string) => void;
 }
 
-.scratch14-sprite-panel {
-  background: linear-gradient(180deg, #e0e2e4 0%, #d0d2d4 100%);
+var registered = false;
+
+function regBlocks() {
+  if (registered) return;
+  registered = true;
+  var d = [
+    {id:'evt_start',msg:'▶ when green button clicked',color:'#c4a000',hat:true,next:true},
+    {id:'evt_key_pressed',msg:'when key %1 pressed',color:'#c4a000',hat:true,next:true,args:[{type:'field_dropdown',name:'KEY',options:[['space','space'],['w','w'],['a','a'],['s','s'],['d','d'],['up arrow','ArrowUp'],['down arrow','ArrowDown'],['left arrow','ArrowLeft'],['right arrow','ArrowRight'],['e','e'],['q','q'],['enter','Enter'],['shift','Shift']]}]},
+    {id:'evt_clicked',msg:'when this sprite clicked',color:'#c4a000',hat:true,next:true},
+    {id:'evt_touching',msg:'when touching %1',color:'#c4a000',hat:true,next:true,args:[{type:'field_input',name:'TARGET',text:'edge'}]},
+    {id:'evt_stop_clicked',msg:'⏹ when stop clicked',color:'#c4a000',hat:true,next:true},
+    {id:'evt_receive',msg:'when I receive %1',color:'#c4a000',hat:true,next:true,args:[{type:'field_input',name:'MSG',text:'message1'}]},
+    {id:'ctrl_forever',msg:'forever',color:'#4a6cd4',cblock:true},
+    {id:'ctrl_if',msg:'if %1 then',color:'#4a6cd4',cblock:true,args:[{type:'field_dropdown',name:'COND',options:[['key w held','key w held'],['key a held','key a held'],['key s held','key s held'],['key d held','key d held'],['key space held','key Space held'],['touching ground','touching ground'],['touching edge','touching edge'],['not touching ground','not touching ground'],['score > 0','score > 0'],['score > 10','score > 10'],['score = 0','score = 0'],['lives > 0','lives > 0']]}]},
+    {id:'ctrl_if_else',msg:'if %1 then',color:'#4a6cd4',cblock:true,hasElse:true,args:[{type:'field_dropdown',name:'COND',options:[['key w held','key w held'],['key a held','key a held'],['key s held','key s held'],['key d held','key d held'],['key space held','key Space held'],['touching ground','touching ground'],['touching edge','touching edge'],['not touching ground','not touching ground'],['score > 0','score > 0'],['score > 10','score > 10']]}]},
+    {id:'ctrl_repeat',msg:'repeat %1 times',color:'#4a6cd4',cblock:true,args:[{type:'field_number',name:'TIMES',value:10}]},
+    {id:'ctrl_wait',msg:'wait %1 secs',color:'#4a6cd4',prev:true,next:true,args:[{type:'field_number',name:'SECS',value:1}]},
+    {id:'ctrl_stop_all',msg:'stop all',color:'#4a6cd4',prev:true},
+    {id:'ctrl_set_speed',msg:'set speed to %1',color:'#4a6cd4',prev:true,next:true,args:[{type:'field_number',name:'SPEED',value:5}]},
+    {id:'ctrl_go_to',msg:'go to x: %1 y: %2',color:'#4a6cd4',prev:true,next:true,args:[{type:'field_number',name:'X',value:0},{type:'field_number',name:'Y',value:0}]},
+    {id:'ctrl_glide_to',msg:'glide %1 secs to x: %2 y: %3',color:'#4a6cd4',prev:true,next:true,args:[{type:'field_number',name:'SECS',value:1},{type:'field_number',name:'X',value:0},{type:'field_number',name:'Y',value:0}]},
+    {id:'ctrl_broadcast',msg:'broadcast %1',color:'#4a6cd4',prev:true,next:true,args:[{type:'field_input',name:'MSG',text:'message1'}]},
+    {id:'ctrl_broadcast_wait',msg:'broadcast %1 and wait',color:'#4a6cd4',prev:true,next:true,args:[{type:'field_input',name:'MSG',text:'message1'}]},
+    {id:'phys_set_gravity',msg:'set gravity to %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'G',value:0.6}]},
+    {id:'phys_jump',msg:'jump with force %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'FORCE',value:12}]},
+    {id:'phys_force',msg:'apply force x: %1 y: %2',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'FX',value:0},{type:'field_number',name:'FY',value:-5}]},
+    {id:'phys_velocity',msg:'set velocity x: %1 y: %2',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'VX',value:0},{type:'field_number',name:'VY',value:0}]},
+    {id:'phys_mass',msg:'set mass to %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'MASS',value:1}]},
+    {id:'phys_bounce',msg:'set bounce to %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'BOUNCE',value:0.5}]},
+    {id:'phys_friction',msg:'set friction to %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'FRICTION',value:0.8}]},
+    {id:'phys_change_x',msg:'change x by %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'DX',value:10}]},
+    {id:'phys_change_y',msg:'change y by %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'DY',value:10}]},
+    {id:'phys_set_x',msg:'set x to %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'X',value:0}]},
+    {id:'phys_set_y',msg:'set y to %1',color:'#e8601c',prev:true,next:true,args:[{type:'field_number',name:'Y',value:0}]},
+    {id:'looks_color',msg:'set color to %1',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_colour',name:'COLOR',colour:'#ff0000'}]},
+    {id:'looks_size',msg:'set size w: %1 h: %2',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_number',name:'W',value:60},{type:'field_number',name:'H',value:60}]},
+    {id:'looks_change_size',msg:'change size by %1',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_number',name:'DS',value:10}]},
+    {id:'looks_show',msg:'show',color:'#7b2f8e',prev:true,next:true},
+    {id:'looks_hide',msg:'hide',color:'#7b2f8e',prev:true,next:true},
+    {id:'looks_ghost',msg:'set ghost effect to %1 %',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_number',name:'GHOST',value:50}]},
+    {id:'looks_say',msg:'say %1',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_input',name:'TEXT',text:'Hello!'}]},
+    {id:'looks_say_for',msg:'say %1 for %2 secs',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_input',name:'TEXT',text:'Hello!'},{type:'field_number',name:'SECS',value:2}]},
+    {id:'looks_rotate',msg:'turn %1 degrees',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_number',name:'DEG',value:15}]},
+    {id:'looks_set_rotation',msg:'set rotation to %1',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_number',name:'DEG',value:0}]},
+    {id:'looks_camera_follow',msg:'camera follow this',color:'#7b2f8e',prev:true,next:true},
+    {id:'looks_layer',msg:'set layer to %1',color:'#7b2f8e',prev:true,next:true,args:[{type:'field_number',name:'LAYER',value:1}]},
+    {id:'snd_play',msg:'play sound %1',color:'#c94fc9',prev:true,next:true,args:[{type:'field_dropdown',name:'SND',options:[['pop','pop'],['jump','jump'],['coin','coin'],['hit','hit'],['beep','beep']]}]},
+    {id:'snd_play_uploaded',msg:'play uploaded sound %1',color:'#c94fc9',prev:true,next:true,args:[{type:'field_dropdown',name:'IDX',options:[['Sound 1','0'],['Sound 2','1'],['Sound 3','2'],['Sound 4','3'],['Sound 5','4']]}]},
+    {id:'snd_volume',msg:'set volume to %1 %',color:'#c94fc9',prev:true,next:true,args:[{type:'field_number',name:'VOL',value:100}]},
+    {id:'snd_stop',msg:'stop all sounds',color:'#c94fc9',prev:true,next:true},
+    {id:'math_set_var',msg:'set %1 to %2',color:'#49a249',prev:true,next:true,args:[{type:'field_input',name:'VAR',text:'myVar'},{type:'field_number',name:'VAL',value:0}]},
+    {id:'math_change_var',msg:'change %1 by %2',color:'#49a249',prev:true,next:true,args:[{type:'field_input',name:'VAR',text:'myVar'},{type:'field_number',name:'VAL',value:1}]},
+    {id:'math_set_score',msg:'set score to %1',color:'#49a249',prev:true,next:true,args:[{type:'field_number',name:'SCORE',value:0}]},
+    {id:'math_change_score',msg:'change score by %1',color:'#49a249',prev:true,next:true,args:[{type:'field_number',name:'DS',value:1}]},
+    {id:'math_reset_score',msg:'reset score',color:'#49a249',prev:true,next:true},
+    {id:'math_log_score',msg:'log score',color:'#49a249',prev:true,next:true},
+    {id:'math_random',msg:'set %1 to random %2 to %3',color:'#49a249',prev:true,next:true,args:[{type:'field_input',name:'VAR',text:'rand'},{type:'field_number',name:'MIN',value:1},{type:'field_number',name:'MAX',value:10}]},
+    {id:'math_log_vars',msg:'log all variables',color:'#49a249',prev:true,next:true},
+    {id:'file_save',msg:'save game as %1',color:'#2e8e8e',prev:true,next:true,args:[{type:'field_input',name:'NAME',text:'save1'}]},
+    {id:'file_load',msg:'load game %1',color:'#2e8e8e',prev:true,next:true,args:[{type:'field_input',name:'NAME',text:'save1'}]},
+    {id:'file_export',msg:'export as JSON',color:'#2e8e8e',prev:true,next:true},
+    {id:'file_import',msg:'import level JSON',color:'#2e8e8e',prev:true,next:true},
+    {id:'file_delete',msg:'delete save %1',color:'#2e8e8e',prev:true,next:true,args:[{type:'field_input',name:'NAME',text:'save1'}]},
+    {id:'log_msg',msg:'log %1',color:'#888888',prev:true,next:true,args:[{type:'field_input',name:'MSG',text:'hello'}]},
+    {id:'log_var',msg:'log variable %1',color:'#888888',prev:true,next:true,args:[{type:'field_input',name:'VAR',text:'myVar'}]},
+    {id:'lib_player_controls',msg:'🎮 Simple Player Controls',color:'#17becf',prev:true,next:true},
+    {id:'lib_platform_lr',msg:'↔️ Platform Move Left-Right',color:'#17becf',prev:true,next:true},
+    {id:'lib_platform_ud',msg:'↕️ Platform Move Up-Down',color:'#17becf',prev:true,next:true},
+  ];
+  for(var i=0;i<d.length;i++){(function(b:any){if(Blockly.Blocks[b.id])return;Blockly.Blocks[b.id]={init:function(this:any){var j:any={type:b.id,colour:b.color,tooltip:b.msg};if(b.cblock){if(b.hasElse){j.message0=b.msg;j.args0=b.args||[];j.message1='%1';j.args1=[{type:'input_statement',name:'DO'}];j.message2='else';j.message3='%1';j.args3=[{type:'input_statement',name:'ELSE'}];j.previousStatement=null;j.nextStatement=null;}else{j.message0=b.msg;j.args0=b.args||[];j.message1='%1';j.args1=[{type:'input_statement',name:'DO'}];j.previousStatement=null;j.nextStatement=null;}}else{j.message0=b.msg;j.args0=b.args||[];if(b.prev)j.previousStatement=null;if(b.next)j.nextStatement=null;}if(b.hat){delete j.previousStatement;j.nextStatement=null;}this.jsonInit(j);}};})(d[i]);}
 }
 
-.viewport-grid {
-  background-image:
-    linear-gradient(rgba(60,120,200,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(60,120,200,0.06) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
+var TOOLBOX={kind:'categoryToolbox',contents:[
+  {kind:'category',name:'⚡ Events',colour:'#c4a000',contents:[{kind:'block',type:'evt_start'},{kind:'block',type:'evt_key_pressed'},{kind:'block',type:'evt_clicked'},{kind:'block',type:'evt_touching'},{kind:'block',type:'evt_stop_clicked'},{kind:'block',type:'evt_receive'}]},
+  {kind:'category',name:'🎮 Controls',colour:'#4a6cd4',contents:[{kind:'block',type:'ctrl_forever'},{kind:'block',type:'ctrl_if'},{kind:'block',type:'ctrl_if_else'},{kind:'block',type:'ctrl_repeat'},{kind:'block',type:'ctrl_wait'},{kind:'block',type:'ctrl_stop_all'},{kind:'block',type:'ctrl_set_speed'},{kind:'block',type:'ctrl_go_to'},{kind:'block',type:'ctrl_glide_to'},{kind:'block',type:'ctrl_broadcast'},{kind:'block',type:'ctrl_broadcast_wait'}]},
+  {kind:'category',name:'🔧 Physics',colour:'#e8601c',contents:[{kind:'block',type:'phys_set_gravity'},{kind:'block',type:'phys_jump'},{kind:'block',type:'phys_force'},{kind:'block',type:'phys_velocity'},{kind:'block',type:'phys_mass'},{kind:'block',type:'phys_bounce'},{kind:'block',type:'phys_friction'},{kind:'block',type:'phys_change_x'},{kind:'block',type:'phys_change_y'},{kind:'block',type:'phys_set_x'},{kind:'block',type:'phys_set_y'}]},
+  {kind:'category',name:'👁️ Looks',colour:'#7b2f8e',contents:[{kind:'block',type:'looks_color'},{kind:'block',type:'looks_size'},{kind:'block',type:'looks_change_size'},{kind:'block',type:'looks_show'},{kind:'block',type:'looks_hide'},{kind:'block',type:'looks_ghost'},{kind:'block',type:'looks_say'},{kind:'block',type:'looks_say_for'},{kind:'block',type:'looks_rotate'},{kind:'block',type:'looks_set_rotation'},{kind:'block',type:'looks_camera_follow'},{kind:'block',type:'looks_layer'}]},
+  {kind:'category',name:'🔊 Sound',colour:'#c94fc9',contents:[{kind:'block',type:'snd_play'},{kind:'block',type:'snd_play_uploaded'},{kind:'block',type:'snd_volume'},{kind:'block',type:'snd_stop'}]},
+  {kind:'category',name:'🔢 Math',colour:'#49a249',contents:[{kind:'block',type:'math_set_var'},{kind:'block',type:'math_change_var'},{kind:'block',type:'math_set_score'},{kind:'block',type:'math_change_score'},{kind:'block',type:'math_reset_score'},{kind:'block',type:'math_log_score'},{kind:'block',type:'math_random'},{kind:'block',type:'math_log_vars'}]},
+  {kind:'category',name:'📁 File',colour:'#2e8e8e',contents:[{kind:'block',type:'file_save'},{kind:'block',type:'file_load'},{kind:'block',type:'file_export'},{kind:'block',type:'file_import'},{kind:'block',type:'file_delete'}]},
+  {kind:'category',name:'📋 Logs',colour:'#888888',contents:[{kind:'block',type:'log_msg'},{kind:'block',type:'log_var'}]},
+  {kind:'category',name:'📚 Library',colour:'#17becf',contents:[{kind:'block',type:'lib_player_controls'},{kind:'block',type:'lib_platform_lr'},{kind:'block',type:'lib_platform_ud'}]},
+]};
 
-.viewport-object { position: absolute; cursor: move; }
-.viewport-object:hover { outline: 2px solid rgba(74,144,217,0.5); outline-offset: 1px; }
-.viewport-object.selected { outline: 2px solid #4a90d9; outline-offset: 1px; }
+var BlocklyWorkspace = forwardRef(function BlocklyWorkspace(props: Props, ref: any) {
+  var selectedSpriteId = props.selectedSpriteId;
+  var onScriptsChange = props.onScriptsChange;
+  var onLog = props.onLog;
+  var containerRef = useRef<HTMLDivElement>(null);
+  var wsRef = useRef<any>(null);
+  var dataMap = useRef<Record<string,any>>({});
+  var swapping = useRef(false);
+  var cbRef = useRef(onScriptsChange);
+  var prevId = useRef(selectedSpriteId);
+  var curId = useRef(selectedSpriteId);
+  var inited = useRef(false);
+  cbRef.current = onScriptsChange;
+  curId.current = selectedSpriteId;
 
-.console-line {
-  font-family: 'Consolas', 'Courier New', monospace;
-  font-size: 10px; padding: 1px 6px;
-  border-bottom: 1px solid #eee;
-  color: #333;
-}
-.console-line.error { color: #cc3333; background: #fff0f0; }
-.console-line.warn { color: #996600; background: #fffae0; }
-.console-line.info { color: #336699; }
+  function extract(ws: any): PlacedBlock[] {
+    var r: PlacedBlock[] = [];
+    var tops = ws.getTopBlocks(true);
+    var seen = new Set<string>();
+    function walk(b: any, pv?: string, pa?: string) {
+      if (!b || seen.has(b.id)) return;
+      seen.add(b.id);
+      var inp: string[] = [];
+      var il = b.inputList || [];
+      for (var i = 0; i < il.length; i++) {
+        var fr = il[i].fieldRow || [];
+        for (var k = 0; k < fr.length; k++) {
+          if (fr[k].name && fr[k].getValue) inp.push(String(fr[k].getValue()));
+        }
+      }
+      var pos = b.getRelativeToSurfaceXY ? b.getRelativeToSurfaceXY() : {x:0,y:0};
+      var pb: PlacedBlock = {uid:b.id,blockId:b.type,inputs:inp,x:pos.x,y:pos.y,spriteId:curId.current};
+      if (pv) pb.prevUid = pv;
+      if (pa) pb.parentUid = pa;
+      var nb = b.getNextBlock ? b.getNextBlock() : null;
+      if (nb && !seen.has(nb.id)) pb.nextUid = nb.id;
+      var di = b.getInput ? b.getInput('DO') : null;
+      if (di && di.connection && di.connection.targetBlock()) {
+        pb.innerUids = [];
+        var c: any = di.connection.targetBlock();
+        while (c && !seen.has(c.id)) { pb.innerUids.push(c.id); c = c.getNextBlock ? c.getNextBlock() : null; }
+      }
+      var ei = b.getInput ? b.getInput('ELSE') : null;
+      if (ei && ei.connection && ei.connection.targetBlock()) {
+        pb.elseUids = [];
+        var e: any = ei.connection.targetBlock();
+        while (e && !seen.has(e.id)) { pb.elseUids.push(e.id); e = e.getNextBlock ? e.getNextBlock() : null; }
+      }
+      r.push(pb);
+      if (di && di.connection && di.connection.targetBlock()) {
+        var x: any = di.connection.targetBlock();
+        while (x && !seen.has(x.id)) { walk(x, undefined, b.id); x = x.getNextBlock ? x.getNextBlock() : null; }
+      }
+      if (ei && ei.connection && ei.connection.targetBlock()) {
+        var y: any = ei.connection.targetBlock();
+        while (y && !seen.has(y.id)) { walk(y, undefined, b.id); y = y.getNextBlock ? y.getNextBlock() : null; }
+      }
+      if (nb && !seen.has(nb.id)) walk(nb, b.id);
+    }
+    for (var t = 0; t < tops.length; t++) walk(tops[t]);
+    return r;
+  }
 
-.scratch14-community-header {
-  background: linear-gradient(180deg, #4e7ec2 0%, #3965a5 100%);
-  padding: 16px 24px;
-  color: #fff;
-}
-.scratch14-community-nav {
-  background: linear-gradient(180deg, #e8eaec 0%, #d5d7d9 100%);
-  border-bottom: 1px solid #aaa;
-  display: flex;
-  padding: 0 16px;
-}
-.scratch14-community-nav-item {
-  padding: 8px 16px; font-size: 12px; color: #555;
-  cursor: pointer; border-bottom: 2px solid transparent; font-weight: 600;
-}
-.scratch14-community-nav-item:hover { color: #333; background: rgba(0,0,0,0.04); }
-.scratch14-community-nav-item.active { color: #2a5ea0; border-bottom-color: #2a5ea0; }
+  function save(ws: any, sid: string) {
+    try { dataMap.current[sid] = {type:'json',data:Blockly.serialization.workspaces.save(ws)}; } catch(_){}
+  }
 
-.scratch14-project-card {
-  background: #fff; border: 1px solid #ccc; border-radius: 6px;
-  overflow: hidden; cursor: pointer; transition: box-shadow 0.15s;
-}
-.scratch14-project-card:hover {
-  box-shadow: 0 3px 12px rgba(0,0,0,0.15); border-color: #4e7ec2;
-}
-.scratch14-project-thumb {
-  width: 100%; height: 100px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px;
-  background: linear-gradient(135deg, #e8ecf2 0%, #d0d6e0 100%);
-  border-bottom: 1px solid #ddd;
-}
+  function load(ws: any, sid: string) {
+    try { var s = dataMap.current[sid]; if (s && s.type==='json') Blockly.serialization.workspaces.load(s.data, ws); } catch(_){}
+  }
 
-/* =============================================
-   GOOGLE BLOCKLY GERAS — 3D GRADIENT SHADOW
-   ============================================= */
+  useImperativeHandle(ref, function() {
+    return {
+      getAllWorkspaceData: function() {
+        if (wsRef.current) save(wsRef.current, curId.current);
+        var c: Record<string,any> = {};
+        var k = Object.keys(dataMap.current);
+        for (var i = 0; i < k.length; i++) c[k[i]] = dataMap.current[k[i]];
+        return c;
+      }
+    };
+  });
 
-.blocklyMainBackground {
-  fill: #d6d8da !important;
-}
+  useEffect(function() {
+    if (!containerRef.current || inited.current) return;
+    inited.current = true;
+    regBlocks();
+    try {
+      wsRef.current = Blockly.inject(containerRef.current, {
+        toolbox: TOOLBOX,
+        grid: {spacing:20,length:3,colour:'#ccc',snap:true},
+        zoom: {controls:true,wheel:true,startScale:0.9,maxScale:3,minScale:0.3},
+        trashcan: true,
+        media: '',
+        sounds: false,
+        renderer: 'geras'
+      });
+      load(wsRef.current, curId.current);
+      wsRef.current.addChangeListener(function(ev: any) {
+        if (swapping.current) return;
+        var t = ev.type;
+        if (!t||t==='ui'||t==='viewport_change'||t==='toolbox_item_select'||t==='click') return;
+        if (t==='create'||t==='delete'||t==='move'||t==='change') {
+          cbRef.current(extract(wsRef.current), curId.current);
+        }
+      });
+      if (onLog) onLog('Blockly ready (geras)');
+    } catch(e) {
+      if (onLog) onLog('Blockly error: '+e);
+    }
+    return function() {
+      if (wsRef.current) { try{wsRef.current.dispose();}catch(_){} wsRef.current=null; }
+      inited.current = false;
+    };
+  }, []);
 
-.blocklyToolboxDiv {
-  background: linear-gradient(180deg, #d8dade 0%, #c0c2c6 100%) !important;
-  border-right: 1px solid #888 !important;
-  overflow: hidden !important;
-  font-family: 'Segoe UI', sans-serif !important;
-  padding: 2px 0 !important;
-}
+  useEffect(function() {
+    if (!wsRef.current || !inited.current) return;
+    var old = prevId.current;
+    prevId.current = selectedSpriteId;
+    if (old === selectedSpriteId) return;
+    swapping.current = true;
+    save(wsRef.current, old);
+    try { wsRef.current.clear(); } catch(_){}
+    load(wsRef.current, selectedSpriteId);
+    setTimeout(function() {
+      swapping.current = false;
+      if (wsRef.current) cbRef.current(extract(wsRef.current), selectedSpriteId);
+    }, 100);
+  }, [selectedSpriteId]);
 
-.blocklyTreeRow {
-  border-radius: 3px !important;
-  margin: 1px 4px !important;
-  padding: 3px 8px !important;
-  height: auto !important;
-  line-height: 18px !important;
-}
-.blocklyTreeRow:hover {
-  background: rgba(100,150,220,0.2) !important;
-}
-.blocklyTreeSelected {
-  background: rgba(100,150,220,0.35) !important;
-}
-.blocklyTreeLabel {
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  font-family: 'Segoe UI', sans-serif !important;
-}
+  return <div ref={containerRef} style={{width:'100%',height:'100%',minHeight:'300px'}} />;
+});
 
-.blocklyFlyoutBackground {
-  fill: #e4e6e8 !important;
-  fill-opacity: 0.97 !important;
-}
-
-/* MAIN BLOCK — gradient shadow on bottom */
-.blocklyPath {
-  stroke-width: 1px !important;
-  filter: drop-shadow(0px 2px 1px rgba(0,0,0,0.3)) !important;
-}
-
-/* DARK EDGE — bottom/right shadow for 3D depth */
-.blocklyPathDark {
-  display: block !important;
-  visibility: visible !important;
-  fill: none !important;
-  stroke-width: 3px !important;
-  stroke-opacity: 0.5 !important;
-  filter: drop-shadow(0px 1px 0px rgba(0,0,0,0.2)) !important;
-}
-
-/* LIGHT EDGE — top/left highlight for 3D shine */
-.blocklyPathLight {
-  display: block !important;
-  visibility: visible !important;
-  stroke-width: 3px !important;
-  stroke-opacity: 0.7 !important;
-  filter: drop-shadow(0px -1px 0px rgba(255,255,255,0.3)) !important;
-}
-
-/* Block text */
-.blocklyText {
-  font-family: 'Lucida Grande', 'Segoe UI', sans-serif !important;
-  font-size: 11px !important;
-  font-weight: bold !important;
-  fill: #fff !important;
-  filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.4)) !important;
-}
-
-.blocklyNonEditableText > text,
-.blocklyEditableText > text {
-  fill: #fff !important;
-}
-
-.blocklyDropdownText {
-  fill: #fff !important;
-  font-size: 11px !important;
-  font-weight: bold !important;
-  filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.3)) !important;
-}
-
-/* Input fields */
-.blocklyEditableText > rect,
-.blocklyEditableText > .blocklyFieldRect {
-  rx: 3 !important;
-  ry: 3 !important;
-  fill: rgba(0,0,0,0.15) !important;
-  stroke: rgba(0,0,0,0.25) !important;
-  stroke-width: 1px !important;
-}
-
-/* Selected block */
-.blocklySelected > .blocklyPath {
-  stroke: #fc3 !important;
-  stroke-width: 2.5px !important;
-  filter: drop-shadow(0px 2px 1px rgba(0,0,0,0.3)) drop-shadow(0 0 6px rgba(255,204,51,0.5)) !important;
-}
-
-/* Dragging block */
-.blocklyDragging > .blocklyPath {
-  filter: drop-shadow(4px 8px 8px rgba(0,0,0,0.4)) !important;
-}
-
-/* Insertion marker */
-.blocklyInsertionMarker > .blocklyPath {
-  fill: rgba(0,0,0,0.12) !important;
-  stroke: none !important;
-  filter: none !important;
-}
-
-/* Connection highlight */
-.blocklyHighlightedConnectionPath {
-  stroke: #fc3 !important;
-  stroke-width: 3px !important;
-  filter: drop-shadow(0 0 5px rgba(255,204,51,0.6)) !important;
-}
-
-/* Scrollbars */
-.blocklyScrollbarHandle {
-  rx: 3 !important;
-  ry: 3 !important;
-  fill: #a0a5ad !important;
-  stroke: #888d95 !important;
-}
-.blocklyScrollbarBackground {
-  fill: #dfe1e3 !important;
-}
-
-/* Trashcan and zoom */
-.blocklyTrash { opacity: 0.5; }
-.blocklyTrash:hover { opacity: 1; }
-.blocklyZoom > image { opacity: 0.5; }
-.blocklyZoom > image:hover { opacity: 1; }
-
-/* Comments */
-.blocklyCommentRect {
-  fill: #fffde7 !important;
-  stroke: #e6a800 !important;
-  rx: 3 !important;
-  ry: 3 !important;
-  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.15)) !important;
-}
-
-/* =============================================
-   HIDE BLOCKLY ARTIFACTS
-   ============================================= */
-.injectionDiv {
-  overflow: hidden !important;
-  clip: rect(0, auto, auto, 0) !important;
-}
-
-article[role="tabpanel"][hidden] {
-  display: none !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  visibility: hidden !important;
-}
-article[role="tabpanel"][hidden] * {
-  display: none !important;
-  overflow: hidden !important;
-  visibility: hidden !important;
-}
-
-.blockly-container-wrapper {
-  overflow: hidden !important;
-  position: relative !important;
-}
-.blockly-container-wrapper:empty {
-  display: none !important;
-}
-
-.blocklyScrollbarHorizontal,
-.blocklyScrollbarVertical {
-  z-index: 1 !important;
-  transition: opacity 0.3s ease !important;
-}
-
-/* =============================================
-   STICKY NOTES
-   ============================================= */
-.sticky-note { pointer-events: all !important; }
-.sticky-note .window {
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.3) !important;
-}
-.sticky-note .window:hover {
-  box-shadow: 2px 3px 14px rgba(0,0,0,0.4) !important;
-}
-.sticky-note .title-bar { cursor: grab !important; user-select: none; }
-.sticky-note textarea {
-  font-family: 'Segoe UI', sans-serif !important;
-  line-height: 1.4;
-}
-
-/* =============================================
-   MISC
-   ============================================= */
-.spinner {
-  display: inline-block;
-  width: 16px; height: 16px;
-  border: 2px solid #ccc;
-  border-top-color: #4580c4;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-ul[role="menubar"] > li { font: var(--w7-font); }
-
-section.tabs { display: flex; flex-direction: column; }
-section.tabs > article[role="tabpanel"] { flex: 1; overflow: hidden; }
+export default BlocklyWorkspace;
